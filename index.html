@@ -1,169 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Pincerna</title>
-
-  <!-- SweetAlert2 -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Elytra Login</title>
+  <link rel="stylesheet" href="login.css" />
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-  <!-- p5 + Tesseract (local libs referenced by you) -->
-  <script src="./lib/p5.js"></script>
-  <script src="./lib/tesseract.min.js"></script>
-
-  <!-- Firebase compat libs -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-  <!-- AUTH CHOICE (first screen) -->
-  <div id="auth-choice-screen" class="auth-screen">
-    <h2>Welcome to Pincerna</h2>
-    <p>Do you want to Log In or Sign Up?</p>
-    <div class="auth-choice-buttons">
-      <button id="choose-login" class="btn">Log In</button>
-      <button id="choose-signup" class="btn">Sign Up</button>
-    </div>
-  </div>
-
-  <!-- SIGNUP SCREEN (kept as you had; includes name, age, gender, allergies) -->
-  <div id="signup-screen" class="auth-screen hidden">
-    <h2>Create Account</h2>
-    <input type="text" id="user-name" placeholder="Name" />
-    <input type="number" id="user-age" placeholder="Age" />
-    <select id="user-gender">
-      <option value="">Select Gender</option>
-      <option value="male">Male</option>
-      <option value="female">Female</option>
-      <option value="other">Other</option>
-    </select>
-    <input type="email" id="user-email" placeholder="Email" />
-    <input type="password" id="user-password" placeholder="Password" />
-    <textarea id="user-allergies" placeholder="Enter your allergies (comma separated)"></textarea>
-
-    <div class="auth-buttons">
-      <button id="signup-button" class="btn">Sign Up</button>
-      <button id="back-to-choice" class="btn ghost">Back</button>
-    </div>
-
-    <div id="auth-error" class="auth-error"></div>
-  </div>
-
-  <!-- LOGIN SCREEN (kept unchanged) -->
-  <div id="login-screen" class="auth-screen hidden">
-    <h2>Log In</h2>
-    <input type="email" id="login-email" placeholder="Email" />
-    <input type="password" id="login-password" placeholder="Password" />
-    <div class="auth-buttons">
-      <button id="login-button" class="btn">Log In</button>
-      <button id="back-to-choice-login" class="btn ghost">Back</button>
-    </div>
-    <div id="auth-error-login" class="auth-error"></div>
-  </div>
-
-  <!-- NAVBAR (white bar as requested; shown after login) -->
-  <header id="app-header" class="topbar hidden">
-    <div class="topbar-left">
-      <img src="./assets/logo.jpeg" alt="Logo" class="logo" />
-      <div class="app-title">Pincerna</div>
-    </div>
-    <nav class="topbar-right">
-      <button id="nav-home" class="nav-btn">Home</button>
-      <button id="nav-scanner" class="nav-btn">Scanner</button>
-      <button id="nav-allergies" class="nav-btn">Allergies</button>
-      <button id="nav-history" class="nav-btn">History</button>
-      <button id="account-settings-btn" class="nav-btn">My Account</button>
-      <button id="logout-btn" class="nav-btn">Logout</button>
-    </nav>
-  </header>
-
-  <!-- MAIN PAGES (single-page app style) -->
-  <main id="main-app">
-    <!-- HOME -->
-    <section id="home-screen" class="screen hidden">
-      <div class="hero">
-        <h1>The perfect guide for picking the right ingredient!</h1>
-        <p>Scan labels and detect allergens, additives and risks in seconds.</p>
-        <div class="home-cards">
-          <div class="card">
-            <h3>Scanner</h3>
-            <p>Scan product labels with camera or upload an image.</p>
-            <button id="start-button" class="btn primary">Start Scanner</button>
-          </div>
-          <div class="card">
-            <h3>Allergies</h3>
-            <p>Manage your personal allergy list and warnings.</p>
-            <button id="open-allergies" class="btn">My Allergies</button>
-          </div>
-          <div class="card">
-            <h3>History</h3>
-            <p>View previously scanned items and reports.</p>
-            <button id="open-history" class="btn">History</button>
-          </div>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="logo-section">
+        <div class="logo-circle">
+          <div class="logo-arrow"></div>
         </div>
+        <h1 class="app-name">elytra</h1>
       </div>
-    </section>
 
-    <!-- SCANNER -->
-    <section id="scanner-screen" class="screen hidden">
-      <div class="scanner-layout">
-        <div id="video-container" class="video-box"></div>
+      <form id="login-form" class="login-form">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="johndoe@gmail.com" required />
 
-        <div class="controls">
-          <button id="scan-button" class="btn primary">Scan</button>
-          <button id="gallery-button" class="btn">Select Image from Gallery</button>
-          <input type="file" id="gallery-input" accept="image/*" style="display:none" />
-          <button id="edit-button" class="btn">Edit Text</button>
-          <button id="save-button" class="btn hidden">Save Changes</button>
-          <button id="reload-button" class="btn ghost">Reload</button>
-        </div>
+        <label>Password</label>
+        <input type="password" id="password" placeholder="••••••••" required />
 
-        <div id="captured-image" class="captured-image"></div>
-        <textarea id="extracted-text" readonly class="extracted-text"></textarea>
-        <div id="diseases" class="diseases"></div>
-      </div>
-    </section>
+        <p class="forgot">Forgot password?</p>
 
-    <!-- ALLERGIES (kept as original page - but with edit modal) -->
-    <section id="allergies-screen" class="screen hidden">
-      <h2>Your Allergies</h2>
-      <div id="profile-allergies" class="profile-allergies">No allergies set.</div>
-      <button id="edit-allergies-btn" class="btn">Edit Allergies</button>
-    </section>
+        <button type="submit" class="login-btn">Log In</button>
 
-    <!-- HISTORY -->
-    <section id="history-screen" class="screen hidden">
-      <h2>Scan History</h2>
-      <div id="history-list">No scans yet.</div>
-    </section>
+        <p class="signup-text">
+          Don’t have an account? <a href="signup.html">Create an Account</a>
+        </p>
+      </form>
+    </div>
+  </div>
 
-    <!-- INFO (team etc) -->
-    <section id="info-screen" class="screen hidden">
-      <h2>About Pincerna</h2>
-      <p>Team: (dummy members) — we'll add proper bios later.</p>
-      <div class="team-grid">
-        <div class="team-card"><h4>Spandana S.</h4><p>Founder & Product</p></div>
-        <div class="team-card"><h4>Tejus</h4><p>Backend</p></div>
-        <div class="team-card"><h4>Riya</h4><p>Design</p></div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Footer / small white navbar at bottom if needed -->
-  <footer id="bottom-bar" class="bottom-bar hidden">
-    <button id="bb-home" class="bb-btn">Home</button>
-    <button id="bb-scanner" class="bb-btn">Scanner</button>
-    <button id="bb-account" class="bb-btn">Account</button>
-  </footer>
-
-  <!-- Firebase config and app scripts -->
   <script src="./firebase.js"></script>
-  <script src="./auth.js"></script>
-  <script src="./sketch.js"></script>
+  <script>
+    // firebase.js already sets auth & db
+    const loginForm = document.getElementById('login-form');
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      try {
+        const userCred = await auth.signInWithEmailAndPassword(email, password);
+        const uid = userCred.user.uid;
+
+        // Get user info
+        const doc = await db.collection('users').doc(uid).get();
+        if (doc.exists) {
+          const userData = doc.data();
+          Swal.fire({
+            title: `Welcome back, ${userData.name}!`,
+            text: `We’ve loaded your profile.`,
+            icon: "success",
+            confirmButtonColor: "#00c6ff"
+          }).then(() => {
+            window.location.href = "home.html"; // redirect to your main app
+          });
+        } else {
+          Swal.fire("Error", "User data not found in database.", "error");
+        }
+      } catch (error) {
+        let message = "Login failed.";
+        if (error.code === "auth/user-not-found") {
+          message = "No account found with that email.";
+        } else if (error.code === "auth/wrong-password") {
+          message = "Incorrect password.";
+        } else if (error.code === "auth/invalid-email") {
+          message = "Invalid email format.";
+        }
+        Swal.fire("Oops!", message, "error");
+      }
+    });
+  </script>
 </body>
 </html>
