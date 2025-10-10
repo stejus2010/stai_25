@@ -1,43 +1,114 @@
-/*
-This is the final single-page HTML app for Elytra.
-All login/signup, home, scanner, allergies, nutrition report, history, and info are combined into one index.html.
-Firebase and OCR scanner logic included. Navbar is white. Buttons and navigation are wired.
-*/
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Elytra App</title>
-<link rel="stylesheet" href="style.css">
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pincerna — Home</title>
+
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- p5 + tesseract lib for scanner -->
+  <script src="./lib/p5.js"></script>
+  <script src="./lib/tesseract.min.js"></script>
+
+  <!-- Firebase libs (compat already in firebase.js) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
+  <!-- White NavBar -->
+  <header class="topnav">
+    <div class="nav-left">
+      <img src="./assets/logo.jpeg" alt="logo" class="nav-logo">
+      <h3>Pincerna</h3>
+    </div>
+    <div class="nav-right">
+      <button id="open-settings" class="btn ghost">Account</button>
+      <button id="logout" class="btn ghost">Logout</button>
+    </div>
+  </header>
 
-<!-- White Navbar -->
-<div id="navbar" class="navbar">
-  <button onclick="showHome()">Home</button>
-  <button onclick="showScanner()">Scanner</button>
-  <button onclick="showAllergies()">Allergies</button>
-  <button onclick="showHistory()">History</button>
-  <button onclick="showInfo()">Info</button>
-</div>
+  <main class="app-shell">
+    <!-- Home Section -->
+    <section id="home-screen" class="screen">
+      <div class="hero">
+        <h1>Find what's inside — protect your gut.</h1>
+        <p class="lead">Scan ingredient lists and get instant allergy & risk alerts.</p>
+        <div class="home-actions">
+          <button id="go-scanner" class="btn primary">Open Scanner</button>
+          <button id="go-allergies" class="btn outline">My Allergies</button>
+        </div>
+      </div>
 
-<!-- Screens -->
-<div id="login-screen" class="screen"></div>
-<div id="signup-screen" class="screen"></div>
-<div id="home-screen" class="screen"></div>
-<div id="scanner-screen" class="screen"></div>
-<div id="allergies-screen" class="screen"></div>
-<div id="history-screen" class="screen"></div>
-<div id="info-screen" class="screen"></div>
+      <div class="features">
+        <div class="feature-card">
+          <h4>Quick Scan</h4>
+          <p>Point, capture, and get risks in seconds.</p>
+        </div>
+        <div class="feature-card">
+          <h4>Allergy Guard</h4>
+          <p>Automatically checks your listed allergens.</p>
+        </div>
+        <div class="feature-card">
+          <h4>History</h4>
+          <p>Saved scans so you can review later.</p>
+        </div>
+      </div>
 
-<script src="app.js"></script>
+      
+      </div>
+    </section>
+
+    <!-- Scanner Section (we keep scanner UI) -->
+    <section id="scanner-screen" class="screen" style="display:none;">
+      <div class="scanner-wrapper">
+        <div id="video-container" class="video-box"></div>
+        <div id="captured-image" class="captured-box"></div>
+      </div>
+
+      <div class="scanner-controls">
+        <button id="scan-button" class="btn primary">Scan</button>
+        <button id="gallery-button" class="btn outline">Select Image</button>
+        <input type="file" id="gallery-input" accept="image/*" style="display:none;">
+        <button id="edit-button" class="btn">Edit Text</button>
+        <button id="save-button" class="btn" style="display:none;">Save</button>
+      </div>
+
+      <textarea id="extracted-text" readonly placeholder="OCR output will appear here..."></textarea>
+    </section>
+
+    <!-- Allergies Section -->
+    <section id="allergies-screen" class="screen" style="display:none;">
+      <h2>My Allergies</h2>
+      <p>List your allergies (comma separated)</p>
+      <textarea id="allergy-input" placeholder="Peanuts, Gluten"></textarea>
+      <div style="margin-top:12px">
+        <button id="save-allergies" class="btn primary">Save Allergies</button>
+      </div>
+    </section>
+
+    <!-- History Section -->
+    <section id="history-screen" class="screen" style="display:none;">
+      <h2>Scan History</h2>
+      <div id="history-list" class="history-list"></div>
+      <div style="margin-top:12px">
+        <button id="clear-history" class="btn outline">Clear History</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- Bottom white nav -->
+  <nav class="bottom-nav">
+    <button id="nav-home" class="bn active">Home</button>
+    <button id="nav-scanner" class="bn">Scanner</button>
+    <button id="nav-allergies" class="bn">Allergies</button>
+    <button id="nav-history" class="bn">History</button>
+  </nav>
+
+  <script src="./firebase.js"></script>
+  <script src="./app.js"></script>
+  <script src="./sketch.js"></script>
 </body>
 </html>
