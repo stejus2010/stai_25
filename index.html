@@ -1,84 +1,43 @@
+/*
+This is the final single-page HTML app for Elytra.
+All login/signup, home, scanner, allergies, nutrition report, history, and info are combined into one index.html.
+Firebase and OCR scanner logic included. Navbar is white. Buttons and navigation are wired.
+*/
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Elytra Login</title>
-  <link rel="stylesheet" href="login.css" />
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elytra App</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.0.2/dist/tesseract.min.js"></script>
 </head>
 <body>
-  <div class="login-container">
-    <div class="login-card">
-      <div class="logo-section">
-        <div class="logo-circle">
-          <div class="logo-arrow"></div>
-        </div>
-        <h1 class="app-name">elytra</h1>
-      </div>
 
-      <form id="login-form" class="login-form">
-        <label>Email</label>
-        <input type="email" id="email" placeholder="johndoe@gmail.com" required />
+<!-- White Navbar -->
+<div id="navbar" class="navbar">
+  <button onclick="showHome()">Home</button>
+  <button onclick="showScanner()">Scanner</button>
+  <button onclick="showAllergies()">Allergies</button>
+  <button onclick="showHistory()">History</button>
+  <button onclick="showInfo()">Info</button>
+</div>
 
-        <label>Password</label>
-        <input type="password" id="password" placeholder="••••••••" required />
+<!-- Screens -->
+<div id="login-screen" class="screen"></div>
+<div id="signup-screen" class="screen"></div>
+<div id="home-screen" class="screen"></div>
+<div id="scanner-screen" class="screen"></div>
+<div id="allergies-screen" class="screen"></div>
+<div id="history-screen" class="screen"></div>
+<div id="info-screen" class="screen"></div>
 
-        <p class="forgot">Forgot password?</p>
-
-        <button type="submit" class="login-btn">Log In</button>
-
-        <p class="signup-text">
-          Don’t have an account? <a href="signup.html">Create an Account</a>
-        </p>
-      </form>
-    </div>
-  </div>
-
-  <script src="./firebase.js"></script>
-  <script>
-    // firebase.js already sets auth & db
-    const loginForm = document.getElementById('login-form');
-
-    loginForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-
-      try {
-        const userCred = await auth.signInWithEmailAndPassword(email, password);
-        const uid = userCred.user.uid;
-
-        // Get user info
-        const doc = await db.collection('users').doc(uid).get();
-        if (doc.exists) {
-          const userData = doc.data();
-          Swal.fire({
-            title: `Welcome back, ${userData.name}!`,
-            text: `We’ve loaded your profile.`,
-            icon: "success",
-            confirmButtonColor: "#00c6ff"
-          }).then(() => {
-            window.location.href = "home.html"; // redirect to your main app
-          });
-        } else {
-          Swal.fire("Error", "User data not found in database.", "error");
-        }
-      } catch (error) {
-        let message = "Login failed.";
-        if (error.code === "auth/user-not-found") {
-          message = "No account found with that email.";
-        } else if (error.code === "auth/wrong-password") {
-          message = "Incorrect password.";
-        } else if (error.code === "auth/invalid-email") {
-          message = "Invalid email format.";
-        }
-        Swal.fire("Oops!", message, "error");
-      }
-    });
-  </script>
+<script src="app.js"></script>
 </body>
 </html>
