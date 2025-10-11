@@ -19,11 +19,9 @@ function startCamera() {
   navigator.mediaDevices.getUserMedia(constraints)
     .then(stream => {
       cameraInput = createCapture(VIDEO);
-      cameraInput.size(640, 360);
+      cameraInput.size(360, 240);
       cameraInput.parent('video-container');
       cameraInput.elt.srcObject = stream;
-      cameraInput.elt.style.objectFit = 'none';
-      cameraInput.elt.style.borderRadius = '12px';
 
       // wire buttons (they exist in home.html)
       const scanButton = document.getElementById('scan-button');
@@ -209,5 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const sc = document.getElementById('scanner-screen');
   if (sc && sc.style.display !== 'none') ensureStartCamera();
 });
+
 
 
