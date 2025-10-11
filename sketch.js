@@ -22,7 +22,7 @@ function startCamera() {
       cameraInput.size(640, 360);
       cameraInput.parent('video-container');
       cameraInput.elt.srcObject = stream;
-      cameraInput.elt.style.objectFit = 'contain';
+      cameraInput.elt.style.objectFit = 'none';
       cameraInput.elt.style.borderRadius = '12px';
 
       // wire buttons (they exist in home.html)
@@ -209,4 +209,5 @@ document.addEventListener('DOMContentLoaded', () => {
   const sc = document.getElementById('scanner-screen');
   if (sc && sc.style.display !== 'none') ensureStartCamera();
 });
+
 
