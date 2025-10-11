@@ -1,9 +1,8 @@
-// sketch.js
 let cameraInput;
 let extractedTextElement;
 let harmfulIngredientsData = {};
 
-// load ingredients JSON
+// Load ingredients JSON
 fetch('ingredients.json')
   .then(r => r.json())
   .then(data => harmfulIngredientsData = data.harmfulIngredients || {})
@@ -18,12 +17,23 @@ function startCamera() {
   const constraints = { video: { facingMode: "environment" } };
   navigator.mediaDevices.getUserMedia(constraints)
     .then(stream => {
-      cameraInput = createCapture(VIDEO);
-      cameraInput.size(400, 300);
-      cameraInput.parent('video-container');
-      cameraInput.elt.srcObject = stream;
+      const video = document.createElement('video');
+      video.id = 'camera';
+      video.autoplay = true;
+      video.playsInline = true;
+      video.srcObject = stream;
+      video.style.width = '100%';
+      video.style.height = 'auto';
+      video.style.objectFit = 'contain'; // full frame visible
+      video.style.borderRadius = '12px';
+      video.style.transform = 'none';
+      
+      const container = document.getElementById('video-container');
+      container.innerHTML = '';
+      container.appendChild(video);
+      cameraInput = video;
 
-      // wire buttons (they exist in home.html)
+      // Button logic
       const scanButton = document.getElementById('scan-button');
       const galleryButton = document.getElementById('gallery-button');
       const galleryInput = document.getElementById('gallery-input');
@@ -43,27 +53,35 @@ function startCamera() {
 }
 
 function captureImage() {
-  const w = 640, h = 360;
-  const cap = createGraphics(w, h);
-  cap.image(cameraInput, 0, 0, w, h);
-  const data = cap.canvas.toDataURL();
-  document.getElementById('captured-image').innerHTML = `<img src="${data}" alt="captured" style="width:320px;border-radius:8px">`;
-  // hide live feed
-  if (cameraInput) cameraInput.hide();
-  extractTextFromImage(cap.canvas);
+  const canvas = document.createElement('canvas');
+  canvas.width = cameraInput.videoWidth;
+  canvas.height = cameraInput.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(cameraInput, 0, 0, canvas.width, canvas.height);
+  const data = canvas.toDataURL();
+
+  document.getElementById('captured-image').innerHTML = `
+    <img src="${data}" alt="captured" style="width:100%;max-width:400px;border-radius:8px">
+  `;
+  extractTextFromImage(canvas);
 }
 
 function processGalleryImage(file) {
   const reader = new FileReader();
   reader.onload = (e) => {
     const src = e.target.result;
-    document.getElementById('captured-image').innerHTML = `<img src="${src}" alt="selected" style="width:320px;border-radius:8px">`;
+    document.getElementById('captured-image').innerHTML = `
+      <img src="${src}" alt="selected" style="width:100%;max-width:400px;border-radius:8px">
+    `;
     const img = new Image();
     img.src = src;
     img.onload = () => {
-      const canvas = createGraphics(img.width, img.height);
-      canvas.drawingContext.drawImage(img,0,0,img.width,img.height);
-      extractTextFromImage(canvas.canvas);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      extractTextFromImage(canvas);
     };
   };
   reader.readAsDataURL(file);
@@ -80,13 +98,12 @@ function extractTextFromImage(canvasEl) {
     .catch(err => {
       console.error('ocr err', err);
       extractedTextElement.value = '';
-      Swal.fire('OCR failed','Try again','error');
+      Swal.fire('OCR failed', 'Try again', 'error');
     });
 }
 
 function checkAllergiesThenHarmful(extractedText) {
   const textLower = extractedText.toLowerCase();
-
   auth.onAuthStateChanged(async (user) => {
     let allergyAlerts = [];
     if (user) {
@@ -96,12 +113,11 @@ function checkAllergiesThenHarmful(extractedText) {
         allergyAlerts = allergies.filter(a => a && textLower.includes(a.toLowerCase()));
       }
     }
-
     if (allergyAlerts.length > 0) {
       Swal.fire({
-        icon:'warning',
-        title:'Allergy Alert!',
-        text:`Contains: ${allergyAlerts.join(', ')}`
+        icon: 'warning',
+        title: 'Allergy Alert!',
+        text: `Contains: ${allergyAlerts.join(', ')}`
       }).then(() => detectHarmfulIngredients(extractedText, allergyAlerts));
     } else {
       detectHarmfulIngredients(extractedText, allergyAlerts);
@@ -110,17 +126,17 @@ function checkAllergiesThenHarmful(extractedText) {
 }
 
 function detectHarmfulIngredients(extractedText, allergyAlerts = []) {
-  const cleaned = extractedText.toLowerCase().replace(/[^\w\s]/g,' ').replace(/\s+/g,' ').trim();
+  const cleaned = extractedText.toLowerCase().replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
   const words = cleaned.split(' ').filter(Boolean);
-  const ignore = new Set(['and','or','with','the','a','to','of']);
+  const ignore = new Set(['and', 'or', 'with', 'the', 'a', 'to', 'of']);
   const filtered = words.filter(w => !ignore.has(w));
 
-  const synonyms = { 'e300':'ascorbic acid','vitamin c':'ascorbic acid','e330':'citric acid' };
+  const synonyms = { 'e300': 'ascorbic acid', 'vitamin c': 'ascorbic acid', 'e330': 'citric acid' };
   const found = new Set();
 
-  for (let i=0;i<filtered.length;i++){
+  for (let i = 0; i < filtered.length; i++) {
     const w = filtered[i];
-    const bigram = i<filtered.length-1 ? (w+' '+filtered[i+1]) : null;
+    const bigram = i < filtered.length - 1 ? (w + ' ' + filtered[i + 1]) : null;
     const wMapped = synonyms[w] || w;
     const bMapped = bigram ? (synonyms[bigram] || bigram) : null;
 
@@ -132,23 +148,21 @@ function detectHarmfulIngredients(extractedText, allergyAlerts = []) {
 
   if (foundArr.length > 0) {
     Swal.fire({
-      icon:'error',
-      title:'Harmful ingredients detected!',
-      text:'Tap Show Risks for details.',
-      showCancelButton:true,
-      confirmButtonText:'Show Risks'
+      icon: 'error',
+      title: 'Harmful ingredients detected!',
+      text: 'Tap Show Risks for details.',
+      showCancelButton: true,
+      confirmButtonText: 'Show Risks'
     }).then(async res => {
       if (res.isConfirmed) {
-        Swal.fire({ icon:'warning', title:'Potential risks', text: foundArr.join('\n') });
+        Swal.fire({ icon: 'warning', title: 'Potential risks', text: foundArr.join('\n') });
       }
-      // After user sees results, save a summary to Firestore
       await saveScanResult(extractedText, allergyAlerts, foundArr);
-      // refresh history
       if (window.appLoadHistory) window.appLoadHistory();
     });
   } else {
-    Swal.fire({ icon:'success', title:'No harmful ingredients detected.' });
-       saveScanResult(extractedText, allergyAlerts, foundArr);
+    Swal.fire({ icon: 'success', title: 'No harmful ingredients detected.' });
+    saveScanResult(extractedText, allergyAlerts, foundArr);
     if (window.appLoadHistory) window.appLoadHistory();
   }
 }
@@ -157,7 +171,7 @@ async function saveScanResult(extractedText, allergyAlerts, foundArr) {
   const user = auth.currentUser;
   const doc = {
     timestamp: firebase.firestore.FieldValue.serverTimestamp ? firebase.firestore.FieldValue.serverTimestamp() : Date.now(),
-    ingredients: extractedText.slice(0,2000),
+    ingredients: extractedText.slice(0, 2000),
     allergiesFound: allergyAlerts,
     harmfulNotes: foundArr
   };
@@ -165,49 +179,39 @@ async function saveScanResult(extractedText, allergyAlerts, foundArr) {
     if (user) {
       await db.collection('users').doc(user.uid).collection('history').add(doc);
     } else {
-      // fallback: save to localStorage
       const arr = JSON.parse(localStorage.getItem('localHistory') || '[]');
       arr.unshift(doc);
-      localStorage.setItem('localHistory', JSON.stringify(arr.slice(0,50)));
+      localStorage.setItem('localHistory', JSON.stringify(arr.slice(0, 50)));
     }
   } catch (err) {
     console.error('saveScan err', err);
   }
 }
 
-function enableEditing(){
+function enableEditing() {
   const ta = document.getElementById('extracted-text');
   ta.readOnly = false;
-  document.getElementById('edit-button').style.display='none';
-  document.getElementById('save-button').style.display='inline';
+  document.getElementById('edit-button').style.display = 'none';
+  document.getElementById('save-button').style.display = 'inline';
 }
 
-function saveChanges(){
+function saveChanges() {
   const ta = document.getElementById('extracted-text');
   const edited = ta.value;
   ta.readOnly = true;
-  document.getElementById('edit-button').style.display='inline';
-  document.getElementById('save-button').style.display='none';
-  // run detection again on edited text
+  document.getElementById('edit-button').style.display = 'inline';
+  document.getElementById('save-button').style.display = 'none';
   checkAllergiesThenHarmful(edited);
 }
 
-// Autostart camera when scanner screen shown
 document.addEventListener('DOMContentLoaded', () => {
-  // If nav sends to scanner, start camera when screen visible
   const navScanner = document.getElementById('nav-scanner');
   const goScanner = document.getElementById('go-scanner');
-  function ensureStartCamera(){
+  function ensureStartCamera() {
     if (!cameraInput) startCamera();
-    if (cameraInput) cameraInput.show && cameraInput.show();
   }
   navScanner && navScanner.addEventListener('click', ensureStartCamera);
   goScanner && goScanner.addEventListener('click', ensureStartCamera);
-  // Also start automatically if loaded and visible
   const sc = document.getElementById('scanner-screen');
   if (sc && sc.style.display !== 'none') ensureStartCamera();
 });
-
-
-
-
