@@ -19,7 +19,7 @@ function startCamera() {
   navigator.mediaDevices.getUserMedia(constraints)
     .then(stream => {
       cameraInput = createCapture(VIDEO);
-      cameraInput.size(1280, 720);
+      // cameraInput.size(1280, 720);
       cameraInput.parent('video-container');
       cameraInput.elt.srcObject = stream;
       cameraInput.elt.style.objectFit = 'cover';
@@ -209,4 +209,5 @@ document.addEventListener('DOMContentLoaded', () => {
   const sc = document.getElementById('scanner-screen');
   if (sc && sc.style.display !== 'none') ensureStartCamera();
 });
+
 
