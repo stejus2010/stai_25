@@ -15,15 +15,12 @@ function setup() {
 }
 
 function startCamera() {
-  const constraints = { video: { facingMode: "environment" } };
-  navigator.mediaDevices.getUserMedia(constraints)
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
     .then(stream => {
       cameraInput = createCapture(VIDEO);
-      // cameraInput.size(1280, 720);
+      cameraInput.size(360, 240);
       cameraInput.parent('video-container');
-      cameraInput.elt.srcObject = stream;
-      cameraInput.elt.style.objectFit = 'cover';
-      cameraInput.elt.style.borderRadius = '12px';
+      cameraInput.elt.srcObject = stream;;
 
       // wire buttons (they exist in home.html)
       const scanButton = document.getElementById('scan-button');
@@ -45,7 +42,7 @@ function startCamera() {
 }
 
 function captureImage() {
-  const w = 1280, h = 720;
+  const w = 640, h = 360;
   const cap = createGraphics(w, h);
   cap.image(cameraInput, 0, 0, w, h);
   const data = cap.canvas.toDataURL();
@@ -209,5 +206,3 @@ document.addEventListener('DOMContentLoaded', () => {
   const sc = document.getElementById('scanner-screen');
   if (sc && sc.style.display !== 'none') ensureStartCamera();
 });
-
-
