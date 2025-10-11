@@ -15,12 +15,15 @@ function setup() {
 }
 
 function startCamera() {
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+  const constraints = { video: { facingMode: "environment" } };
+  navigator.mediaDevices.getUserMedia(constraints)
     .then(stream => {
       cameraInput = createCapture(VIDEO);
-      cameraInput.size(360, 240);
+      cameraInput.size(640, 360);
       cameraInput.parent('video-container');
-      cameraInput.elt.srcObject = stream;;
+      cameraInput.elt.srcObject = stream;
+      cameraInput.elt.style.objectFit = 'fill';
+      cameraInput.elt.style.borderRadius = '12px';
 
       // wire buttons (they exist in home.html)
       const scanButton = document.getElementById('scan-button');
