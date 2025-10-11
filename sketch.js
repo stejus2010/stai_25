@@ -19,7 +19,7 @@ function startCamera() {
   navigator.mediaDevices.getUserMedia(constraints)
     .then(stream => {
       cameraInput = createCapture(VIDEO);
-      cameraInput.size(640, 360);
+      cameraInput.size(1280, 720);
       cameraInput.parent('video-container');
       cameraInput.elt.srcObject = stream;
       cameraInput.elt.style.objectFit = 'cover';
@@ -45,7 +45,7 @@ function startCamera() {
 }
 
 function captureImage() {
-  const w = 640, h = 360;
+  const w = 1280, h = 720;
   const cap = createGraphics(w, h);
   cap.image(cameraInput, 0, 0, w, h);
   const data = cap.canvas.toDataURL();
@@ -209,3 +209,4 @@ document.addEventListener('DOMContentLoaded', () => {
   const sc = document.getElementById('scanner-screen');
   if (sc && sc.style.display !== 'none') ensureStartCamera();
 });
+
