@@ -1,4 +1,3 @@
-// firebase.js
 const firebaseConfig = {
   apiKey: "AIzaSyAMpv1EQCg-W7Fr_MXyfmLlO5zAGLAWXMo",
   authDomain: "stai-437917.firebaseapp.com",
@@ -10,7 +9,90 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-// expose globals so other scripts (auth.js, sketch.js) can use them
-window.auth = firebase.auth();
-window.db = firebase.firestore();
+// --- Navigation ---
+const pages = document.querySelectorAll('.page');
+const links = document.querySelectorAll('.nav-links a');
+links.forEach(link => {
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    const id = link.id.replace('-link', '');
+    pages.forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  });
+});
+
+document.getElementById('go-scanner').onclick = () => {
+  pages.forEach(p => p.classList.remove('active'));
+  document.getElementById('scanner').classList.add('active');
+};
+
+// --- Billing Logic ---
+async function updateDailyUsage(type) {
+  const user = auth.currentUser;
+  if (!user) {
+    Swal.fire('Please log in first!');
+    return false;
+  }
+
+  const docRef = db.collection('users').doc(user.uid);
+  const docSnap = await docRef.get();
+  let data = docSnap.data();
+
+  if (!data) {
+    await docRef.set({
+      plan: 'free',
+      scansToday: 0,
+      aiAnalysisToday: 0,
+      lastScanDate: new Date().toISOString().split('T')[0]
+    });
+    data = (await docRef.get()).data();
+  }
+
+  const today = new Date().toISOString().split('T')[0];
+  if (data.lastScanDate !== today) {
+    await docRef.update({ scansToday: 0, aiAnalysisToday: 0, lastScanDate: today });
+    data.scansToday = 0;
+    data.aiAnalysisToday = 0;
+  }
+
+  if (type === 'scan' && data.plan === 'free' && data.scansToday >= 8) {
+    Swal.fire('Limit reached', 'Upgrade to Premium for unlimited scans.', 'info');
+    return false;
+  }
+  if (type === 'analysis' && data.plan === 'free' && data.aiAnalysisToday >= 5) {
+    Swal.fire('Limit reached', 'Upgrade to Premium for unlimited analyses.', 'info');
+    return false;
+  }
+
+  await docRef.update({
+    scansToday: type === 'scan' ? (data.scansToday + 1) : data.scansToday,
+    aiAnalysisToday: type === 'analysis' ? (data.aiAnalysisToday + 1) : data.aiAnalysisToday
+  });
+
+  return true;
+}
+
+document.getElementById('upgrade-btn')?.addEventListener('click', async () => {
+  const user = auth.currentUser;
+  if (!user) {
+    Swal.fire('Please log in first!');
+    return;
+  }
+
+  const choice = await Swal.fire({
+    title: 'Upgrade to Premium?',
+    html: '<b>Unlimited scans + AI analysis</b><br>Only $2.99/month!',
+    icon: 'info',
+    showCancelButton: true,
+    confirmButtonText: 'Upgrade',
+    cancelButtonText: 'Cancel'
+  });
+
+  if (choice.isConfirmed) {
+    await db.collection('users').doc(user.uid).update({ plan: 'premium' });
+    Swal.fire('Success!', 'Your plan has been upgraded to Premium.', 'success');
+  }
+});
