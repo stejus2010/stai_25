@@ -86,7 +86,7 @@
           plan: 'free',            // default free plan
           scanUsed: 0,
           aiUsed: 0,
-          lastReset: firebase.firestore.FieldValue.serverTimestamp()
+          lastReset: firebase.firestore.FieldValue.serverTimestamp(),
           age: age ? parseInt(age) : null,
           gender,
           allergies: allergies ? allergies.split(',').map(a => a.trim()).filter(a => a !== '') : []
@@ -102,4 +102,5 @@
   </script>
 </body>
 </html>
+
 
