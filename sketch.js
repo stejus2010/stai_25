@@ -1,6 +1,9 @@
 let cameraInput;
 let extractedTextElement;
 let harmfulIngredientsData = {};
+let currentUserPlan = 'free';
+let scanCount = 0;
+let analysisCount = 0;
 
 // Load ingredients JSON
 fetch('ingredients.json')
@@ -11,8 +14,25 @@ fetch('ingredients.json')
 function setup() {
   noCanvas();
   extractedTextElement = document.getElementById('extracted-text');
+
+  // Track user plan and usage
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      const doc = await db.collection('users').doc(user.uid).get();
+      if (doc.exists) {
+        const data = doc.data();
+        currentUserPlan = data.plan || 'free';
+        scanCount = data.scansToday || 0;
+        analysisCount = data.analysisToday || 0;
+      } else {
+        currentUserPlan = 'free';
+      }
+    } else currentUserPlan = 'free';
+    updateUsageUI();
+  });
 }
 
+// 🎥 Start Camera
 function startCamera() {
   const constraints = { video: { facingMode: "environment" } };
   navigator.mediaDevices.getUserMedia(constraints)
@@ -23,17 +43,16 @@ function startCamera() {
       video.playsInline = true;
       video.srcObject = stream;
       video.style.width = '100%';
-      video.style.height = 'auto';
-      video.style.objectFit = 'contain'; // full frame visible
+      video.style.height = 'calc(100vh - 180px)';
+      video.style.objectFit = 'contain';
       video.style.borderRadius = '12px';
-      video.style.transform = 'none';
-      
+
       const container = document.getElementById('video-container');
       container.innerHTML = '';
       container.appendChild(video);
       cameraInput = video;
 
-      // Button logic
+      // Buttons
       const scanButton = document.getElementById('scan-button');
       const galleryButton = document.getElementById('gallery-button');
       const galleryInput = document.getElementById('gallery-input');
@@ -52,7 +71,115 @@ function startCamera() {
     .catch(err => console.error('camera err', err));
 }
 
-function captureImage() {
+// 📊 Update Progress Bars + Premium Card
+function updateUsageUI() {
+  const scanProgress = document.getElementById('scan-progress');
+  const aiProgress = document.getElementById('ai-progress');
+  const scanText = document.getElementById('scan-text');
+  const aiText = document.getElementById('ai-text');
+  const premiumSection = document.querySelector('.premium-section');
+
+  const maxScans = 8;
+  const maxAI = 5;
+
+  if (scanProgress) {
+    scanProgress.value = scanCount;
+    scanProgress.max = maxScans;
+  }
+  if (aiProgress) {
+    aiProgress.value = analysisCount;
+    aiProgress.max = maxAI;
+  }
+  if (scanText) scanText.textContent = `${scanCount}/${maxScans} Scans Today`;
+  if (aiText) aiText.textContent = `${analysisCount}/${maxAI} AI Analyses Today`;
+
+  if (premiumSection) {
+    premiumSection.style.display = currentUserPlan === 'premium' ? 'none' : 'block';
+  }
+
+  const usageText = document.getElementById('usage-text');
+  const progressBar = document.getElementById('usage-progress');
+  if (usageText && progressBar) {
+    const totalUsed = scanCount + analysisCount;
+    const totalLimit = currentUserPlan === 'premium' ? 1 : (maxScans + maxAI);
+    const percent = currentUserPlan === 'premium' ? 100 : Math.min((totalUsed / totalLimit) * 100, 100);
+    progressBar.style.width = percent + '%';
+    progressBar.style.background = percent >= 100 ? '#ff4d4d' : '#00c6ff';
+    usageText.textContent =
+      currentUserPlan === 'premium'
+        ? 'Unlimited access for Premium users 🏆'
+        : `Used ${totalUsed}/${totalLimit} actions today`;
+  }
+}
+
+// 🧠 Limit Check
+async function checkScanLimit(type = 'scan') {
+  const user = auth.currentUser;
+  if (!user) {
+    Swal.fire('Please log in to use scanning.');
+    return false;
+  }
+
+  const docRef = db.collection('users').doc(user.uid);
+  const docSnap = await docRef.get();
+  const today = new Date().toISOString().split('T')[0];
+  let data = docSnap.exists ? docSnap.data() : null;
+
+  if (!data) {
+    await docRef.set({
+      plan: 'free',
+      scansToday: 0,
+      analysisToday: 0,
+      lastScanDate: today
+    });
+    data = { plan: 'free', scansToday: 0, analysisToday: 0, lastScanDate: today };
+  }
+
+  if (data.lastScanDate !== today) {
+    await docRef.update({ scansToday: 0, analysisToday: 0, lastScanDate: today });
+    data.scansToday = 0;
+    data.analysisToday = 0;
+  }
+
+  const maxScans = 8, maxAI = 5;
+  if (data.plan === 'free') {
+    if (type === 'scan' && data.scansToday >= maxScans) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Daily Scan Limit Reached',
+        text: 'Upgrade to Premium for unlimited scans 🚀'
+      });
+      document.querySelector('.premium-section')?.scrollIntoView({ behavior: 'smooth' });
+      return false;
+    }
+    if (type === 'ai' && data.analysisToday >= maxAI) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Daily AI Analysis Limit Reached',
+        text: 'Upgrade to Premium for unlimited analyses 🚀'
+      });
+      document.querySelector('.premium-section')?.scrollIntoView({ behavior: 'smooth' });
+      return false;
+    }
+  }
+
+  await docRef.update({
+    [`${type === 'scan' ? 'scansToday' : 'analysisToday'}`]:
+      (type === 'scan' ? data.scansToday : data.analysisToday) + 1,
+    lastScanDate: today
+  });
+
+  if (type === 'scan') scanCount++;
+  else analysisCount++;
+  updateUsageUI();
+  return true;
+}
+
+// 📸 Capture from Camera
+async function captureImage() {
+  const allowed = await checkScanLimit('scan');
+  if (!allowed) return;
+
   const canvas = document.createElement('canvas');
   canvas.width = cameraInput.videoWidth;
   canvas.height = cameraInput.videoHeight;
@@ -66,6 +193,7 @@ function captureImage() {
   extractTextFromImage(canvas);
 }
 
+// 🖼️ From Gallery
 function processGalleryImage(file) {
   const reader = new FileReader();
   reader.onload = (e) => {
@@ -87,8 +215,12 @@ function processGalleryImage(file) {
   reader.readAsDataURL(file);
 }
 
-function extractTextFromImage(canvasEl) {
+// 🔍 OCR Text Extraction
+async function extractTextFromImage(canvasEl) {
   extractedTextElement.value = 'Recognizing...';
+  const allowed = await checkScanLimit('ai');
+  if (!allowed) return;
+
   Tesseract.recognize(canvasEl, 'eng', { logger: m => console.log(m) })
     .then(({ data }) => {
       const text = data.text || '';
@@ -102,6 +234,7 @@ function extractTextFromImage(canvasEl) {
     });
 }
 
+// 🧾 Allergy & Harmful Ingredient Checks
 function checkAllergiesThenHarmful(extractedText) {
   const textLower = extractedText.toLowerCase();
   auth.onAuthStateChanged(async (user) => {
@@ -145,7 +278,6 @@ function detectHarmfulIngredients(extractedText, allergyAlerts = []) {
   }
 
   const foundArr = Array.from(found);
-
   if (foundArr.length > 0) {
     Swal.fire({
       icon: 'error',
@@ -154,9 +286,8 @@ function detectHarmfulIngredients(extractedText, allergyAlerts = []) {
       showCancelButton: true,
       confirmButtonText: 'Show Risks'
     }).then(async res => {
-      if (res.isConfirmed) {
+      if (res.isConfirmed)
         Swal.fire({ icon: 'warning', title: 'Potential risks', text: foundArr.join('\n') });
-      }
       await saveScanResult(extractedText, allergyAlerts, foundArr);
       if (window.appLoadHistory) window.appLoadHistory();
     });
@@ -167,6 +298,7 @@ function detectHarmfulIngredients(extractedText, allergyAlerts = []) {
   }
 }
 
+// 💾 Save Result
 async function saveScanResult(extractedText, allergyAlerts, foundArr) {
   const user = auth.currentUser;
   const doc = {
@@ -188,6 +320,7 @@ async function saveScanResult(extractedText, allergyAlerts, foundArr) {
   }
 }
 
+// ✏️ Edit Text
 function enableEditing() {
   const ta = document.getElementById('extracted-text');
   ta.readOnly = false;
@@ -204,9 +337,12 @@ function saveChanges() {
   checkAllergiesThenHarmful(edited);
 }
 
+// 🧠 Auto Camera Init + Premium Upgrade Button
 document.addEventListener('DOMContentLoaded', () => {
   const navScanner = document.getElementById('nav-scanner');
   const goScanner = document.getElementById('go-scanner');
+  const upgradeBtn = document.getElementById('upgrade-btn');
+
   function ensureStartCamera() {
     if (!cameraInput) startCamera();
   }
@@ -214,4 +350,20 @@ document.addEventListener('DOMContentLoaded', () => {
   goScanner && goScanner.addEventListener('click', ensureStartCamera);
   const sc = document.getElementById('scanner-screen');
   if (sc && sc.style.display !== 'none') ensureStartCamera();
+
+  if (upgradeBtn) {
+    upgradeBtn.addEventListener('click', async () => {
+      const user = auth.currentUser;
+      if (!user) {
+        Swal.fire('Please log in to upgrade.');
+        return;
+      }
+      await db.collection('users').doc(user.uid).update({ plan: 'premium' });
+      currentUserPlan = 'premium';
+      Swal.fire('🎉 You are now a Premium user! Enjoy unlimited scans & AI analysis.');
+      updateUsageUI();
+    });
+  }
+
+  updateUsageUI();
 });
