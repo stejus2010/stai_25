@@ -248,3 +248,37 @@ textarea {
   padding: 12px;
   border-radius: 10px;
 }
+/* Premium Upgrade Section */
+.premium-section {
+  margin-top: 36px;
+  background: linear-gradient(135deg, rgba(0, 198, 255, 0.08), rgba(0, 114, 255, 0.05));
+  border-radius: 16px;
+  padding: 28px;
+  text-align: center;
+  color: var(--text);
+}
+
+.premium-section h2 {
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+
+.premium-card {
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 24px;
+  display: inline-block;
+  max-width: 360px;
+}
+
+.premium-card h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.premium-card p {
+  color: var(--muted);
+  margin-bottom: 16px;
+}
