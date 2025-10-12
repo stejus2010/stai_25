@@ -57,11 +57,21 @@
         </div>
       </div>
 
-      
+      <!-- ===== Usage Progress Bar ===== -->
+      <div class="usage-card">
+        <h3>Daily Usage</h3>
+        <div class="usage-item">
+          <label>Scans: <span id="scan-text">0/8</span></label>
+          <progress id="scan-progress" value="0" max="8"></progress>
+        </div>
+        <div class="usage-item">
+          <label>AI Analyses: <span id="ai-text">0/5</span></label>
+          <progress id="ai-progress" value="0" max="5"></progress>
+        </div>
       </div>
     </section>
 
-    <!-- Scanner Section (we keep scanner UI) -->
+    <!-- Scanner Section -->
     <section id="scanner-screen" class="screen" style="display:none;">
       <div class="scanner-wrapper">
         <div id="video-container" class="video-box"></div>
@@ -97,6 +107,19 @@
         <button id="clear-history" class="btn outline">Clear History</button>
       </div>
     </section>
+
+    <!-- ====== Premium Upgrade Section ====== -->
+    <section id="premium-card" class="premium-section">
+      <h2>Unlock Premium</h2>
+      <p class="lead">
+        Get unlimited scans and AI analyses. Go beyond the 8-scan and 5-analysis daily free limit.
+      </p>
+      <div class="premium-card-inner">
+        <h3>Premium Plan</h3>
+        <p>Unlimited scans · Unlimited AI analysis · Priority updates</p>
+        <button id="upgrade-btn" class="btn primary">Go Premium 🚀</button>
+      </div>
+    </section>
   </main>
 
   <!-- Bottom white nav -->
@@ -107,8 +130,33 @@
     <button id="nav-history" class="bn">History</button>
   </nav>
 
+  <!-- Firebase & App Scripts -->
   <script src="./firebase.js"></script>
   <script src="./app.js"></script>
   <script src="./sketch.js"></script>
+
+  <!-- <script>
+  // ✅ Premium Upgrade Logic
+  document.addEventListener('DOMContentLoaded', () => {
+    const upgradeBtn = document.getElementById('upgrade-btn');
+    if (upgradeBtn) {
+      upgradeBtn.addEventListener('click', async () => {
+        const user = auth.currentUser;
+        if (!user) {
+          Swal.fire('Login required', 'Please sign in to upgrade.', 'info');
+          return;
+        }
+        try {
+          await db.collection('users').doc(user.uid).update({ plan: 'premium' });
+          Swal.fire('Success 🎉', 'You’ve been upgraded to Premium!', 'success');
+          document.getElementById('premium-card').style.display = 'none';
+        } catch (err) {
+          console.error(err);
+          Swal.fire('Error', 'Could not upgrade. Try again later.', 'error');
+        }
+      });
+    }
+  });
+  </script> -->
 </body>
 </html>
