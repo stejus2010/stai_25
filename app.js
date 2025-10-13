@@ -1,6 +1,4 @@
 // app.js
-// Requires firebase.js loaded first (so auth & db are available)
-
 document.addEventListener('DOMContentLoaded', () => {
   // DOM
   const screens = {
@@ -29,13 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const historyList = document.getElementById('history-list');
   const clearHistoryBtn = document.getElementById('clear-history');
 
-  // Helper: show screen
   function showScreen(name) {
     Object.keys(screens).forEach(k => screens[k].style.display = (k === name) ? 'block' : 'none');
     Object.keys(navButtons).forEach(k => navButtons[k].classList.toggle('active', k === name));
   }
 
-  // Wire bottom nav
   navButtons.home.addEventListener('click', () => showScreen('home'));
   navButtons.scanner.addEventListener('click', () => showScreen('scanner'));
   navButtons.allergies.addEventListener('click', () => showScreen('allergies'));
@@ -47,26 +43,20 @@ document.addEventListener('DOMContentLoaded', () => {
   // Auth state
   auth.onAuthStateChanged(async (user) => {
     if (!user) {
-      // Not logged in, redirect to login page
       window.location.href = 'login.html';
       return;
     }
-    // Load user info and populate allergies input
     const doc = await db.collection('users').doc(user.uid).get();
     const data = doc.exists ? doc.data() : {};
     allergyInput.value = (data.allergies || []).join(', ');
-
-    // Load history for user
     loadHistory();
   });
 
-  // Logout
   logoutBtn.addEventListener('click', async () => {
     await auth.signOut();
     window.location.href = 'login.html';
   });
 
-  // Account settings modal (Swal)
   openSettingsBtn.addEventListener('click', async () => {
     const user = auth.currentUser;
     if (!user) return;
@@ -79,10 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
         `<input id="sw-name" class="swal2-input" placeholder="Name" value="${data.name || ''}">` +
         `<input id="sw-age" type="number" class="swal2-input" placeholder="Age" value="${data.age || ''}">` +
         `<select id="sw-gender" class="swal2-input">
-            <option value="">Select Gender</option>
-            <option value="Male" ${data.gender==='Male' ? 'selected' : ''}>Male</option>
-            <option value="Female" ${data.gender==='Female' ? 'selected' : ''}>Female</option>
-            <option value="Other" ${data.gender==='Other' ? 'selected' : ''}>Other</option>
+          <option value="">Select Gender</option>
+          <option value="Male" ${data.gender==='Male' ? 'selected' : ''}>Male</option>
+          <option value="Female" ${data.gender==='Female' ? 'selected' : ''}>Female</option>
+          <option value="Other" ${data.gender==='Other' ? 'selected' : ''}>Other</option>
         </select>` +
         `<input id="sw-allergies" class="swal2-input" placeholder="Allergies (comma separated)" value="${(data.allergies||[]).join(', ')}">` +
         `<input id="sw-email" class="swal2-input" placeholder="Email" value="${data.email || user.email || ''}" readonly>`,
@@ -101,20 +91,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }).then(result => {
       if (result.isConfirmed && result.value) {
-        const payload = {
-          name: result.value.name,
-          age: result.value.age,
-          gender: result.value.gender,
-          allergies: result.value.allergies
-        };
-        db.collection('users').doc(user.uid).set(payload, { merge: true })
+        db.collection('users').doc(user.uid).set(result.value, { merge: true })
           .then(() => Swal.fire('Saved', 'Account updated', 'success'))
           .catch(err => Swal.fire('Error', err.message, 'error'));
       }
     });
   });
 
-  // Save allergies
   saveAllergiesBtn.addEventListener('click', async () => {
     const user = auth.currentUser;
     if (!user) return;
@@ -123,7 +106,6 @@ document.addEventListener('DOMContentLoaded', () => {
     Swal.fire('Saved', 'Allergies updated', 'success');
   });
 
-  // History: load from Firestore subcollection users/{uid}/history
   async function loadHistory() {
     const user = auth.currentUser;
     historyList.innerHTML = '<div style="color:#9aaed0">Loading...</div>';
@@ -156,7 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
       confirmButtonText: 'Clear'
     });
     if (!ok.isConfirmed) return;
-    // delete docs in the subcollection (simple approach)
     const snap = await db.collection('users').doc(user.uid).collection('history').get();
     const batch = db.batch();
     snap.forEach(doc => batch.delete(doc.ref));
@@ -165,9 +146,50 @@ document.addEventListener('DOMContentLoaded', () => {
     Swal.fire('Cleared', 'History cleared', 'success');
   });
 
-  // Expose loadHistory to global (scanner can call it after saving)
   window.appLoadHistory = loadHistory;
-
-  // initial screen
   showScreen('home');
 });
+
+// ========== Demo Payment Modal ==========
+function openDemoPaymentModal() {
+  Swal.fire({
+    title: 'Upgrade to Premium (Demo)',
+    html:
+      '<input id="pay-name" class="swal2-input" placeholder="Cardholder name">' +
+      '<input id="pay-email" class="swal2-input" placeholder="Billing email">' +
+      '<input id="pay-card" class="swal2-input" maxlength="19" placeholder="Card number (demo)">' +
+      '<div style="display:flex; gap:8px;">' +
+      '<input id="pay-exp" class="swal2-input" placeholder="MM/YY">' +
+      '<input id="pay-cvv" class="swal2-input" maxlength="4" placeholder="CVV">' +
+      '</div>' +
+      '<small style="display:block;color:#99a8c7;margin-top:6px;">Demo only — no real payment.</small>',
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: 'Pay $2.99 (Demo)',
+    preConfirm: () => {
+      const name = document.getElementById('pay-name').value.trim();
+      const email = document.getElementById('pay-email').value.trim();
+      const card = document.getElementById('pay-card').value.trim();
+      if (!name || !email || card.length < 12) {
+        Swal.showValidationMessage('Fill in all fields properly');
+        return false;
+      }
+      return { name, email, card };
+    }
+  }).then(async res => {
+    if (!res.value) return;
+    Swal.fire({ title: 'Processing...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+    await new Promise(r => setTimeout(r, 1200));
+    const user = auth.currentUser;
+    if (!user) {
+      Swal.fire('Please log in first.');
+      return;
+    }
+    await db.collection('users').doc(user.uid).set({
+      plan: 'premium',
+      premiumSince: new Date().toISOString(),
+      billing: { name: res.value.name, email: res.value.email, last4: res.value.card.slice(-4), demo: true }
+    }, { merge: true });
+    Swal.fire('Upgraded!', 'Your plan is now Premium (demo).', 'success');
+  });
+}
