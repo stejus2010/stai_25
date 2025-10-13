@@ -1,3 +1,4 @@
+// firebase.js
 const firebaseConfig = {
   apiKey: "AIzaSyAMpv1EQCg-W7Fr_MXyfmLlO5zAGLAWXMo",
   authDomain: "stai-437917.firebaseapp.com",
@@ -12,24 +13,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// --- Navigation ---
-const pages = document.querySelectorAll('.page');
-const links = document.querySelectorAll('.nav-links a');
-links.forEach(link => {
-  link.addEventListener('click', e => {
-    e.preventDefault();
-    const id = link.id.replace('-link', '');
-    pages.forEach(p => p.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-  });
-});
-
-document.getElementById('go-scanner').onclick = () => {
-  pages.forEach(p => p.classList.remove('active'));
-  document.getElementById('scanner').classList.add('active');
-};
-
-// --- Billing Logic ---
+// --- Billing / Usage logic ---
 async function updateDailyUsage(type) {
   const user = auth.currentUser;
   if (!user) {
@@ -75,24 +59,7 @@ async function updateDailyUsage(type) {
   return true;
 }
 
-document.getElementById('upgrade-btn')?.addEventListener('click', async () => {
-  const user = auth.currentUser;
-  if (!user) {
-    Swal.fire('Please log in first!');
-    return;
-  }
-
-  const choice = await Swal.fire({
-    title: 'Upgrade to Premium?',
-    html: '<b>Unlimited scans + AI analysis</b><br>Only $2.99/month!',
-    icon: 'info',
-    showCancelButton: true,
-    confirmButtonText: 'Upgrade',
-    cancelButtonText: 'Cancel'
-  });
-
-  if (choice.isConfirmed) {
-    await db.collection('users').doc(user.uid).update({ plan: 'premium' });
-    Swal.fire('Success!', 'Your plan has been upgraded to Premium.', 'success');
-  }
+// --- Premium upgrade button (basic) ---
+document.getElementById('upgrade-btn')?.addEventListener('click', () => {
+  openDemoPaymentModal();
 });
