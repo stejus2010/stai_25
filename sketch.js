@@ -351,27 +351,27 @@ document.addEventListener('DOMContentLoaded', () => {
   const sc = document.getElementById('scanner-screen');
   if (sc && sc.style.display !== 'none') ensureStartCamera();
 
-document.getElementById('upgrade-btn')?.addEventListener('click', async () => {
-  const user = auth.currentUser;
-  if (!user) {
-    Swal.fire('Please log in first!');
-    return;
-  }
+// document.getElementById('upgrade-btn')?.addEventListener('click', async () => {
+//   const user = auth.currentUser;
+//   if (!user) {
+//     Swal.fire('Please log in first!');
+//     return;
+//   }
 
-  const choice = await Swal.fire({
-    title: 'Upgrade to Premium?',
-    html: '<b>Unlimited scans + AI analysis</b><br>Only $2.99/month!',
-    icon: 'info',
-    showCancelButton: true,
-    confirmButtonText: 'Upgrade',
-    cancelButtonText: 'Cancel'
-  });
+//   const choice = await Swal.fire({
+//     title: 'Upgrade to Premium?',
+//     html: '<b>Unlimited scans + AI analysis</b><br>Only $2.99/month!',
+//     icon: 'info',
+//     showCancelButton: true,
+//     confirmButtonText: 'Upgrade',
+//     cancelButtonText: 'Cancel'
+//   });
 
-  if (choice.isConfirmed) {
-    await db.collection('users').doc(user.uid).update({ plan: 'premium' });
-    Swal.fire('Success!', '🎉 You are now a Premium user! Enjoy unlimited scans & AI analysis.', 'success');
-  }
-});
+//   if (choice.isConfirmed) {
+//     await db.collection('users').doc(user.uid).update({ plan: 'premium' });
+//     Swal.fire('Success!', '🎉 You are now a Premium user! Enjoy unlimited scans & AI analysis.', 'success');
+//   }
+// });
 
   updateUsageUI();
 });
