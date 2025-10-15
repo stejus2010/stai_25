@@ -1,0 +1,452 @@
+{
+  "harmfulIngredients": {
+      "aspartame": {
+          "diseases": [
+              "Aspartame can cause headaches and allergic reactions in some individuals. It's often considered safe in moderation",
+              "but some studies suggest a potential link to health issues."
+          ]
+      },
+      "sucralose": {
+          "diseases": [
+              "Sucralose is generally recognized as safe",
+              "but some studies suggest it may alter gut bacteria and cause digestive issues."
+          ]
+      },
+      "saccharin": {
+          "diseases": [
+              "Saccharin has been linked to bladder cancer in laboratory animals",
+              "but extensive studies show it is safe for human consumption in moderation."
+          ]
+      },
+      "stevia": {
+          "diseases": [
+              "Stevia is a natural sweetener and may have health benefits",
+              "including lowering blood sugar levels and having antioxidant properties."
+          ]
+      },
+      "red 40": {
+          "diseases": [
+              "Red 40 is associated with allergic reactions and hyperactivity in children",
+              "although the evidence is inconclusive."
+          ]
+      },
+      "yellow 5": {
+          "diseases": [
+              "Yellow 5 may cause allergic reactions in some people and has been linked to hyperactivity in children."
+          ]
+      },
+      "blue 1": {
+          "diseases": [
+              "Blue 1 has been associated with allergic reactions and potential behavioral effects in children."
+          ]
+      },
+      "sodium benzoate": {
+          "diseases": [
+              "Sodium benzoate may produce benzene",
+              "a known carcinogen",
+              "when combined with vitamin C",
+              "and has been linked to hyperactivity in children."
+          ]
+      },
+      "benzoate": {
+          "diseases": [
+              "Benzoates can cause allergic reactions in some individuals and have been associated with hyperactivity in children."
+          ]
+      },
+      "potassium sorbate": {
+          "diseases": [
+              "Potassium sorbate is generally recognized as safe but may cause skin irritation or allergic reactions in sensitive individuals."
+          ]
+      },
+      "sorbate": {
+          "diseases": [
+              "Sorbates are generally safe but can cause allergic reactions in some people."
+          ]
+      },
+      "natural and artificial flavors": {
+          "diseases": [
+              "Natural and artificial flavors can contain various compounds",
+              "some of which may trigger allergies or sensitivities."
+          ]
+      },
+      "high maltose corn syrup": {
+          "diseases": [
+              "High maltose corn syrup is a high-calorie sweetener that may contribute to obesity and metabolic disorders."
+          ]
+      },
+      "interestified fats": {
+          "diseases": [
+              "Interestified fats can impact cholesterol levels and may be linked to health issues",
+              "depending on their sources."
+          ]
+      },
+      "preservative": {
+          "diseases": [
+              "Some preservatives may cause allergic reactions or sensitivities",
+              "while others are considered safe."
+          ]
+      },
+      "sugar": {
+          "diseases": [
+              "Excessive sugar consumption can lead to obesity",
+              "diabetes",
+              "and heart disease."
+          ]
+      },
+      "salt": {
+          "diseases": [
+              "High salt intake can lead to hypertension and increase the risk of heart disease."
+          ]
+      },
+      "water": {
+          "diseases": [
+              "Water is essential for life",
+              "but excessive consumption can lead to water intoxication."
+          ]
+      },
+      "wheat": {
+          "diseases": [
+              "Wheat can trigger gluten sensitivities or celiac disease in some individuals."
+          ]
+      },
+      "milk": {
+          "diseases": [
+              "Milk is a good source of calcium and vitamin D but can cause lactose intolerance in some people."
+          ]
+      },
+      "vegetable oil": {
+          "diseases": [
+              "Excessive consumption of vegetable oils",
+              "particularly those high in omega-6 fatty acids",
+              "may lead to inflammation."
+          ]
+      },
+      "palm oil": {
+          "diseases": [
+              "Palm oil is high in saturated fats",
+              "which may increase cholesterol levels if consumed excessively."
+          ]
+      },
+      "corn syrup": {
+          "diseases": [
+              "Corn syrup is high in fructose and can contribute to obesity and metabolic syndrome."
+          ]
+      },
+      "dextrose": {
+          "diseases": [
+              "Dextrose is a simple sugar that can spike blood sugar levels if consumed in excess."
+          ]
+      },
+      "glucose": {
+          "diseases": [
+              "Glucose is a primary energy source",
+              "but excessive intake can lead to health issues like obesity and diabetes."
+          ]
+      },
+      "fructose": {
+          "diseases": [
+              "Fructose can lead to insulin resistance and fatty liver disease when consumed in large amounts."
+          ]
+      },
+      "citric acid": {
+          "diseases": [
+              "Citric acid is generally safe",
+              "but excessive consumption may cause digestive issues for some individuals."
+          ]
+      },
+      "sodium bicarbonate": {
+          "diseases": [
+              "Sodium bicarbonate can help with indigestion but excessive use may lead to metabolic alkalosis."
+          ]
+      },
+      "xanthan gum": {
+          "diseases": [
+              "Xanthan gum is generally safe",
+              "but excessive consumption can cause digestive issues."
+          ]
+      },
+      "soy lecithin": {
+          "diseases": [
+              "Soy lecithin is considered safe but may cause allergic reactions in those sensitive to soy."
+          ]
+      },
+      "cocoa butter": {
+          "diseases": [
+              "Cocoa butter is high in fat but is generally healthy when consumed in moderation."
+          ]
+      },
+      "cocoa solids": {
+          "diseases": [
+              "Cocoa solids contain antioxidants and may have heart health benefits but can also contain sugar in processed forms."
+          ]
+      },
+      "skimmed milk powder": {
+          "diseases": [
+              "Skimmed milk powder is low in fat but provides essential nutrients",
+              "making it a healthy choice."
+          ]
+      },
+      "whole milk powder": {
+          "diseases": [
+              "Whole milk powder contains fats that can contribute to overall calorie intake",
+              "impacting weight management."
+          ]
+      },
+      "maltodextrin": {
+          "diseases": [
+              "Maltodextrin can spike blood sugar levels and should be consumed in moderation by those with diabetes."
+          ]
+      },
+      "whey protein concentrate": {
+          "diseases": [
+              "Whey protein is a high-quality protein source",
+              "beneficial for muscle recovery but may cause digestive issues in lactose-intolerant individuals."
+          ]
+      },
+      "gelatin": {
+          "diseases": [
+              "Gelatin is safe for most but can cause allergic reactions in some."
+          ]
+      },
+      "corn starch": {
+          "diseases": [
+              "Corn starch is a high-calorie thickener and should be consumed in moderation."
+          ]
+      },
+      "potato starch": {
+          "diseases": [
+              "Potato starch is a carbohydrate that can spike blood sugar levels and should be consumed in moderation."
+          ]
+      },
+      "modified starch": {
+          "diseases": [
+              "Modified starches are used as thickeners but may contain additives that some individuals may want to avoid."
+          ]
+      },
+      "rice flour": {
+          "diseases": [
+              "Rice flour is gluten-free but can spike blood sugar levels in excess."
+          ]
+      },
+      "barley malt extract": {
+          "diseases": [
+              "Barley malt extract can contribute to overall calorie intake and should be consumed in moderation."
+          ]
+      },
+      "natural flavoring": {
+          "diseases": [
+              "Natural flavorings can vary widely; their health impact depends on the source ingredients."
+          ]
+      },
+      "artificial flavoring": {
+          "diseases": [
+              "Artificial flavorings may have health risks depending on their chemical composition."
+          ]
+      },
+      "monosodium glutamate (msg)": {
+          "diseases": [
+              "MSG is considered safe by regulatory agencies",
+              "but some individuals may experience sensitivity."
+          ]
+      },
+      "soy protein isolate": {
+          "diseases": [
+              "Soy protein isolate is a good protein source but can cause allergic reactions in sensitive individuals."
+          ]
+      },
+      "yeast extract": {
+          "diseases": [
+              "Yeast extract can provide flavor but may contain high sodium levels."
+          ]
+      },
+      "baking powder": {
+          "diseases": [
+              "Baking powder is generally safe but can contribute to sodium intake."
+          ]
+      },
+      "sodium chloride": {
+          "diseases": [
+              "Excessive sodium chloride intake can lead to hypertension and cardiovascular issues."
+          ]
+      },
+      "calcium carbonate": {
+          "diseases": [
+              "Calcium carbonate is a common calcium supplement",
+              "generally safe in recommended amounts."
+          ]
+      },
+      "caramel color": {
+          "diseases": [
+              "Caramel color may contain compounds that some individuals may wish to avoid."
+          ]
+      },
+      "ascorbic acid": {
+          "diseases": [
+              "Ascorbic acid",
+              "or vitamin C",
+              "is an antioxidant and is generally safe in recommended doses."
+          ]
+      },
+      "vanilla extract": {
+          "diseases": [
+              "Vanilla extract is generally safe but may contain alcohol and added sugars."
+          ]
+      },
+      "soybean oil": {
+          "diseases": [
+              "Soybean oil is high in omega-6 fatty acids and should be consumed in moderation."
+          ]
+      },
+      "hydrogenated oils": {
+          "diseases": [
+              "Hydrogenated oils may contain trans fats",
+              "which are linked to health issues."
+          ]
+      },
+      "emulsifier": {
+          "diseases": [
+              "Emulsifiers are generally safe but can cause digestive issues in sensitive individuals."
+          ]
+      },
+      "antioxidants": {
+          "diseases": [
+              "Antioxidants are beneficial for health",
+              "reducing oxidative stress and inflammation."
+          ]
+      },
+      "sorbitol": {
+          "diseases": [
+              "Sorbitol can cause digestive issues in large amounts but is used as a low-calorie sweetener."
+          ]
+      },
+      "glycerin": {
+          "diseases": [
+              "Glycerin is generally safe but can cause gastrointestinal distress in high amounts."
+          ]
+      },
+      "pectin": {
+          "diseases": [
+              "Pectin is safe and may have health benefits",
+              "including lowering cholesterol levels."
+          ]
+      },
+      "dextrin": {
+          "diseases": [
+              "Dextrin can spike blood sugar levels and should be consumed in moderation."
+          ]
+      },
+      "lactic acid": {
+          "diseases": [
+              "Lactic acid is safe and often used in fermentation and as a preservative."
+          ]
+      },
+      "sodium nitrate": {
+          "diseases": [
+              "Sodium nitrate can be harmful in high amounts",
+              "linked to certain health risks."
+          ]
+      },
+      "sodium nitrite": {
+          "diseases": [
+              "Sodium nitrite is used in cured meats and may be linked to certain health risks."
+          ]
+      },
+      "calcium phosphate": {
+          "diseases": [
+              "Calcium phosphate is safe and often used as a supplement."
+          ]
+      },
+      "monoglycerides": {
+          "diseases": [
+              "Monoglycerides are generally safe and used as emulsifiers."
+          ]
+      },
+      "diglycerides": {
+          "diseases": [
+              "Diglycerides are generally safe and used as emulsifiers."
+          ]
+      },
+      "enzymes": {
+          "diseases": [
+              "Enzymes are beneficial for digestion and various bodily functions."
+          ]
+      },
+      "carboxymethyl cellulose": {
+          "diseases": [
+              "Carboxymethyl cellulose is generally safe but may cause digestive issues in sensitive individuals."
+          ]
+      },
+      "polysorbate 80": {
+          "diseases": [
+              "Polysorbate 80 is generally safe",
+              "but some studies suggest potential effects on gut health."
+          ]
+      },
+      "propylene glycol": {
+          "diseases": [
+              "Propylene glycol is considered safe in food but can cause irritation in high amounts."
+          ]
+      },
+      "high fructose corn syrup": {
+          "diseases": [
+              "High fructose corn syrup is linked to obesity and metabolic disorders when consumed in excess."
+          ]
+      },
+      "sorbitan monostearate": {
+          "diseases": [
+              "Sorbitan monostearate is generally safe as an emulsifier but may cause digestive issues."
+          ]
+      },
+      "acacia gum": {
+          "diseases": [
+              "Acacia gum is safe and may have health benefits",
+              "including aiding digestion."
+          ]
+      },
+      "sodium metabisulfite": {
+          "diseases": [
+              "Sodium metabisulfite can cause allergic reactions in sensitive individuals."
+          ]
+      },
+      "tapioca starch": {
+          "diseases": [
+              "Tapioca starch is safe but can spike blood sugar levels if consumed in excess."
+          ]
+      },
+      "sunflower oil": {
+          "diseases": [
+              "Sunflower oil is generally healthy",
+              "but excessive intake of omega-6 fatty acids can lead to inflammation."
+          ]
+      },
+      "olive oil": {
+          "diseases": [
+              "Olive oil is beneficial for heart health due to its monounsaturated fats and antioxidants."
+          ]
+      },
+      "canola oil": {
+          "diseases": [
+              "Canola oil is low in saturated fat but may contain omega-6 fatty acids",
+              "which should be consumed in moderation."
+          ]
+      },
+      "almond oil": {
+          "diseases": [
+              "Almond oil is healthy and contains healthy fats but should be consumed in moderation."
+          ]
+      },
+      "flaxseed oil": {
+          "diseases": [
+              "Flaxseed oil is high in omega-3 fatty acids and has health benefits when consumed in moderation."
+          ]
+      },
+      "coconut oil": {
+          "diseases": [
+              "Coconut oil is high in saturated fats",
+              "which should be consumed in moderation."
+          ]
+      }
+  }
+}
+
+  
