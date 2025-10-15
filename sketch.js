@@ -52,7 +52,6 @@ function startCamera() {
       container.appendChild(video);
       cameraInput = video;
 
-      // Buttons
       const scanButton = document.getElementById('scan-button');
       const galleryButton = document.getElementById('gallery-button');
       const galleryInput = document.getElementById('gallery-input');
@@ -226,6 +225,10 @@ async function extractTextFromImage(canvasEl) {
       const text = data.text || '';
       extractedTextElement.value = text;
       checkAllergiesThenHarmful(text);
+
+      // Show AI button
+      const aiBtn = document.getElementById('ai-button');
+      if (aiBtn) aiBtn.style.display = 'inline-block';
     })
     .catch(err => {
       console.error('ocr err', err);
@@ -337,11 +340,61 @@ function saveChanges() {
   checkAllergiesThenHarmful(edited);
 }
 
+// 🧠 AI Analysis Integration (Gemini)
+// const GEMINI_API_KEY = "AIzaSyAC6RyMxHDQYqntTJcraeuXAsGY6MJYbjs"; // Replace with your key
+// const MODEL = "gemini-2.5-flash-latest";
+
+async function runAIAnalysis() {
+  const allowed = await checkScanLimit('ai');
+  if (!allowed) return;
+
+  const text = extractedTextElement.value.trim();
+  if (!text) {
+    Swal.fire('No ingredients found!', 'Please scan first.', 'info');
+    return;
+  }
+
+  const aiBtn = document.getElementById('ai-button');
+  aiBtn.textContent = "Analyzing...";
+  aiBtn.disabled = true;
+
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{
+          role: "user",
+          parts: [{
+            text: `Given these ingredients:\n${text}\nSuggest safer or healthier alternatives for each ingredient and briefly explain why they're better.`
+          }]
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const aiText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "No AI analysis result.";
+    Swal.fire({
+      icon: 'info',
+      title: 'AI Ingredient Analysis 🧠',
+      html: `<div style="text-align:left;white-space:pre-wrap">${aiText}</div>`
+    });
+  } catch (err) {
+    console.error('AI Error', err);
+    Swal.fire('AI analysis failed', 'Try again later', 'error');
+  } finally {
+    aiBtn.textContent = "AI Analysis";
+    aiBtn.disabled = false;
+  }
+}
+
 // 🧠 Auto Camera Init + Premium Upgrade Button
 document.addEventListener('DOMContentLoaded', () => {
   const navScanner = document.getElementById('nav-scanner');
   const goScanner = document.getElementById('go-scanner');
   const upgradeBtn = document.getElementById('upgrade-btn');
+  const aiBtn = document.getElementById('ai-button');
+  if (aiBtn) aiBtn.addEventListener('click', runAIAnalysis);
 
   function ensureStartCamera() {
     if (!cameraInput) startCamera();
@@ -350,28 +403,6 @@ document.addEventListener('DOMContentLoaded', () => {
   goScanner && goScanner.addEventListener('click', ensureStartCamera);
   const sc = document.getElementById('scanner-screen');
   if (sc && sc.style.display !== 'none') ensureStartCamera();
-
-// document.getElementById('upgrade-btn')?.addEventListener('click', async () => {
-//   const user = auth.currentUser;
-//   if (!user) {
-//     Swal.fire('Please log in first!');
-//     return;
-//   }
-
-//   const choice = await Swal.fire({
-//     title: 'Upgrade to Premium?',
-//     html: '<b>Unlimited scans + AI analysis</b><br>Only $2.99/month!',
-//     icon: 'info',
-//     showCancelButton: true,
-//     confirmButtonText: 'Upgrade',
-//     cancelButtonText: 'Cancel'
-//   });
-
-//   if (choice.isConfirmed) {
-//     await db.collection('users').doc(user.uid).update({ plan: 'premium' });
-//     Swal.fire('Success!', '🎉 You are now a Premium user! Enjoy unlimited scans & AI analysis.', 'success');
-//   }
-// });
 
   updateUsageUI();
 });
