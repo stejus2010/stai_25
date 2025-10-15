@@ -86,10 +86,15 @@
         <button id="gallery-button" class="btn outline">Select Image</button>
         <input type="file" id="gallery-input" accept="image/*" style="display:none;">
         <button id="edit-button" class="btn">Edit Text</button>
+        <button id="ai-button" class="btn secondary" style="display:none;">AI Analysis</button>
         <button id="save-button" class="btn" style="display:none;">Save</button>
       </div>
 
       <textarea id="extracted-text" readonly placeholder="OCR output will appear here..."></textarea>
+      <div id="ai-result" class="ai-result-box" style="display:none;">
+        <h3>AI Ingredient Analysis 🧠</h3>
+        <p id="ai-output"></p>
+      </div>
     </section>
 
     <!-- ===== Allergies ===== -->
