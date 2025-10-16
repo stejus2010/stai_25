@@ -78,7 +78,7 @@ function updateUsageUI() {
   const aiText = document.getElementById('ai-text');
   const premiumSection = document.querySelector('.premium-section');
 
-  const maxScans = 8;
+  const maxScans = 5;
   const maxAI = 5;
 
   if (scanProgress) {
@@ -406,3 +406,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
   updateUsageUI();
 });
+
